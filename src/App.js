@@ -1,7 +1,8 @@
 import "./App.css";
-import ForecastedWeatherScreen from "./components/ForecastedWeather";
-import RealTimeWeatherScreen from "./components/RealTimeWeather";
 import WeatherApp from "./components/WeatherApp";
+
+// Add this code at the beginning of your Node.js application
+
 
 function App() {
   return (
