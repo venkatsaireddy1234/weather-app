@@ -1,64 +1,95 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import RealTimeWeather from './RealTimeWeather';
-import ForecastedWeather from './ForecastedWeather';
+import React, { useState, useEffect } from "react";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
+import RealTimeWeatherScreen from "../components/RealTimeWeather";
+import ForecastedWeatherScreen from "../components/ForecastedWeather";
+import { fetchRealTimeWeather } from "../utils/apis/realTimeWeatherApi";
+import { fetchForecastedWeather } from "../utils/apis/forecastWeatherApi";
+import { getLatLngFromPincode } from "../utils/apis/getLatitudeFromPincodeApi";
 
-const WeatherApp =() => {
-  const [realTimeWeather, setRealTimeWeather] = useState({
-    location: '',
-    temperature: 0,
-    description: '',
-  });
-
-  const [forecastedWeather, setForecastedWeather] = useState([]);
+const WeatherApp = () => {
+  const [realTimeWeatherData, setRealTimeWeatherData] = useState(null);
+  const [forecastedWeatherData, setForecastedWeatherData] = useState(null);
+  const [pinCode, setPinCode] = useState("");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
+    // Fetch initial weather data for New York
+    fetchInitialWeatherData();
+  }, []); // Empty dependency array ensures this effect runs only once, on component mount
+
+  const fetchInitialWeatherData = async () => {
+    try {
+      // Fetch real-time weather data for New York
+      const realTimeData = await fetchRealTimeWeather(40.7128, -74.006);
+      setRealTimeWeatherData(realTimeData);
+
+      // Fetch forecasted weather data for New York
+      const forecastedData = await fetchForecastedWeather(40.7128, -74.006);
+      setForecastedWeatherData(forecastedData);
+    } catch (error) {
+      console.error("Error fetching initial weather data:", error);
+    }
+  };
+
+  const handlePinCodeChange = (event) => {
+    setPinCode(event.target.value);
+  };
+
+  const handleSearch = async () => {
+    if (pinCode.trim() !== "") {
+      setLoading(true);
       try {
-        const realTimeWeatherResponse = await axios.get(
-          "https://api.tomorrow.io/v4/weather/realtime?location=42.3478,-71.0466&apikey=etqzL8mWnjQI3mE91XgYVcqpZHjVBagd"
-        );
-
-        const forecastedWeatherResponse = await axios.get(
-            "https://api.tomorrow.io/v4/weather/forecast?location=42.3478,-71.0466&apikey=etqzL8mWnjQI3mE91XgYVcqpZHjVBagd"
-
-        );
-
-        setRealTimeWeather({
-          location: realTimeWeatherResponse.data.location.name,
-          temperature: realTimeWeatherResponse.data.data.temperature,
-          description: realTimeWeatherResponse.data.data.weather.description,
-        });
-
-        setForecastedWeather(
-          forecastedWeatherResponse.data.data.daily.splice(1, 5).map((item) => ({
-            date: item.valid_at,
-            temperature: item.temperatureMax,
-            description: item.weather.description,
-          }))
-        );
+        const { latitude, longitude } = await getLatLngFromPincode(pinCode);
+        await fetchData(latitude, longitude);
       } catch (error) {
-        console.error('Error fetching data:', error);
+        console.error("Error fetching location:", error.message);
+        alert("An error occurred while fetching the location. Please try again later.");
+      } finally {
+        setLoading(false);
+        setPinCode("");
       }
-    };
+    } else {
+      alert("Please enter a valid pin code");
+    }
+  };
 
-    fetchData();
-  }, []);
+  const fetchData = async (latitude, longitude) => {
+    try {
+      // Fetch real-time weather data
+      const realTimeData = await fetchRealTimeWeather(latitude, longitude);
+      setRealTimeWeatherData(realTimeData);
+
+      // Fetch forecasted weather data
+      const forecastedData = await fetchForecastedWeather(latitude, longitude);
+      setForecastedWeatherData(forecastedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+ 
 
   return (
     <div className="p-8">
-      <h1 className="text-4xl font-bold mb-8 text-center">
-        Weather App
-      </h1>
-      <RealTimeWeather {...realTimeWeather} />
-      <h2 className="text-2xl font-bold mt-8 mb-2">
-        Forecasted Weather
-      </h2>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-        {forecastedWeather.map((item, index) => (
-          <ForecastedWeather key={index} {...item} />
-        ))}
+      <h1 className="text-4xl font-bold mb-8 text-center">Weather App</h1>
+      <div>
+        <input type="text" value={pinCode} onChange={handlePinCodeChange} placeholder="Enter pin code" />
+        <button onClick={handleSearch} disabled={loading}>{loading ? "Loading..." : "Search"}</button>
       </div>
+      <Tabs>
+        <TabList>
+          <Tab>Real Time Weather</Tab>
+          <Tab>Forecasted Weather</Tab>
+        </TabList>
+
+        <TabPanel>
+          <RealTimeWeatherScreen weatherData={realTimeWeatherData} />
+        </TabPanel>
+        <TabPanel>
+          <ForecastedWeatherScreen forecastData={forecastedWeatherData} />
+        </TabPanel>
+      </Tabs>
     </div>
   );
 };

@@ -1,34 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import MapContainer from './MapContainer'; // Import the MapContainer component
+import React from 'react';
+import MapContainer from './MapContainer'; 
 
-const RealTimeWeatherScreen = () => {
-  const [weatherData, setWeatherData] = useState(null);
-
-  // Function to fetch weather data based on latitude and longitude
-  const fetchData = async (latitude, longitude) => {
-    const API_KEY = "12a3107fe6f63e85d0efdf00177e6206";
-    const API_URL = `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&APPID=${API_KEY}&units=metric`;
-
-    try {
-      const response = await axios.get(API_URL);
-      setWeatherData(response.data);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-
-  // Function to handle location selection from the map
-  const handleLocationSelect = (location) => {
-    const [latitude, longitude] = location.split(',');
-    fetchData(latitude, longitude);
-  };
-
-  useEffect(() => {
-    // Fetch weather data for New York initially
-    fetchData(40.7128, -74.0060); // Latitude and longitude for New York
-  }, []);
-
+const RealTimeWeatherScreen = ({ weatherData, handlePinCodeChange }) => {
   return (
     <div className="container mx-auto py-8" style={{ backgroundImage: `url('path_to_your_background_image.jpg')` }}>
       {weatherData ? (
@@ -57,7 +30,6 @@ const RealTimeWeatherScreen = () => {
         <p className="text-center">Loading...</p>
       )}
 
-      <MapContainer onLocationSelect={handleLocationSelect} />
     </div>
   );
 };

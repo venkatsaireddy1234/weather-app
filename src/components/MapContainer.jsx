@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const MapContainer = ({ onLocationSelect }) => {
+const MapContainer = ({ onLocationSelect, onPinCodeChange }) => {
   const [pinCode, setPinCode] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handlePinCodeChange = (event) => {
-    setPinCode(event.target.value);
+    const value = event.target.value;
+    setPinCode(value);
+    onPinCodeChange(value); // Pass the pin code value to the parent component
   };
 
   const handleSearch = async () => {
@@ -26,7 +28,6 @@ const MapContainer = ({ onLocationSelect }) => {
       alert('Please enter a valid pin code');
     }
   };
-  
 
   const getLatLngFromPincode = async (pincode) => {
     const API_URL = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(pincode)}`;
