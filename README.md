@@ -8,7 +8,7 @@ To run the application, follow these steps:
 
 1. Clone the repository to your local machine.
 2. Navigate to the project directory.
-3. Install dependencies by running `npm install axios`.
+3. Install dependencies by running `npm install axios` and `npm install react-dom` and `npm install react-icons`
 4. Start the application by running `npm run start`.
 
 ## Dependencies
