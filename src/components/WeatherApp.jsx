@@ -68,14 +68,12 @@ const WeatherApp = () => {
     }
   };
 
- 
-
   return (
-    <div className="p-8">
+    <div className="p-8 bg-left-top	" style={{ backgroundImage: "url('/Images/weather.jpg')" }} >
       <h1 className="text-4xl font-bold mb-8 text-center">Weather App</h1>
-      <div>
-        <input type="text" value={pinCode} onChange={handlePinCodeChange} placeholder="Enter pin code" />
-        <button onClick={handleSearch} disabled={loading}>{loading ? "Loading..." : "Search"}</button>
+      <div className="mb-4 flex justify-center items-center space-x-4"> {/* Added margin bottom and adjusted spacing */}
+        <input type="text" value={pinCode} onChange={handlePinCodeChange} placeholder="Enter pin code" className="px-4 py-2 border rounded-lg" />
+        <button onClick={handleSearch} disabled={loading} className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 cursor-pointer">{loading ? "Loading..." : "Search"}</button>
       </div>
       <Tabs>
         <TabList>

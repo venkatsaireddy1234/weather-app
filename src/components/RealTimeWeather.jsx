@@ -2,7 +2,7 @@ import React from 'react';
 
 const RealTimeWeatherScreen = ({ weatherData, handlePinCodeChange }) => {
   return (
-    <div className="container mx-auto py-8" style={{ backgroundImage: `url('path_to_your_background_image.jpg')` }}>
+    <div className="container mx-auto py-8 bg-cover rounded-md	" style={{ backgroundImage: `url('/Images/RealTime.jpg')` }}>
       {weatherData ? (
         <div>
           <div className="text-center">
